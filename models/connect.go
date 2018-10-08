@@ -1,10 +1,10 @@
 package models
 
 import (
-	"fmt"
 	"log"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 type Map bson.M
@@ -14,23 +14,23 @@ var sessions map[string]*mgo.Session
 // GetSession - get a db session handle
 func GetSession(db string) *mgo.Session {
 	initSessions()
-	uri := getConnectionURI(db)
-	if sessions[db] == nil {
-		log.Println("Initializing Database")
-		mgoSession, err := mgo.Dial(uri)
-		if err != nil {
-			panic(err) // no, not really
-		}
-		mgoSession.SetSafe(&mgo.Safe{WMode: "majority"})
-		sessions[db] = mgoSession
+	mongoDBDialInfo := &mgo.DialInfo{
+		Addrs:    []string{"ds157639.mlab.com:57639"},
+	 	Timeout:  60 * time.Second,
+		Database: db,
+		Username: "bui",
+		Password: "bui123",
 	}
-	return sessions[db].Clone()
+	mongoSession, err := mgo.DialWithInfo(mongoDBDialInfo)
+	if err != nil {
+		log.Fatalf("CreateSession: %s\n", err)
+	}
+
+	mongoSession.SetSafe(&mgo.Safe{WMode: "majority"})
+	return mongoSession
 }
 
-func getConnectionURI(db string) string {
-	uri := fmt.Sprintf("mongodb://%s:%s@%s/%s", "admin", "Welcome1", "35.170.186.108", db)
-	return uri
-}
+
 
 func initSessions() {
 	if sessions == nil {
@@ -44,6 +44,15 @@ func FindOne(db string, collection string, query Map) Map {
 	defer session.Close()
 	coll := session.DB(db).C(collection)
 	coll.Find(query).One(&result)
+	return result
+}
+
+func Find(db string, collection string, query Map) []Map {
+	result := make([]Map, 0)
+	session := GetSession(db)
+	defer session.Close()
+	coll := session.DB(db).C(collection)
+	coll.Find(query).All(&result)
 	return result
 }
 
