@@ -1,0 +1,10 @@
+package: bui-api
+import:
+- package: github.com/astaxie/beego
+- package: gopkg.in/mgo.v2
+  subpackages:
+  - bson
+testImport:
+- package: github.com/smartystreets/goconvey
+  subpackages:
+  - convey
