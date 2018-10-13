@@ -22,5 +22,6 @@ func init() {
 	beego.Router("/service/:id", &controllers.ServiceController{}, "get:GetById")
 	beego.Router("/service", &controllers.ServiceController{}, "post:AddService")
 	beego.Router("/service", &controllers.ServiceController{}, "get:AllServices")
+	beego.Router("/service", &controllers.ServiceController{}, "delete:DeleteService")
 	
 }
