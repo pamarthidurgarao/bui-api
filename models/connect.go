@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
+	"errors"
 )
 
 type Map bson.M
@@ -76,4 +77,19 @@ func Update(db string, collection string, query Map, upd Map) error {
 		log.Println(err)
 	}
 	return err
+}
+
+func Delete(db string, collection string, query Map) error {
+	session := GetSession(db)
+	defer session.Close()
+	res := Find(db,collection,query);
+	coll := session.DB(db).C(collection)
+	for _, b := range res {
+	err := coll.Remove(b)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	err1 := errors.New("")
+	return err1
 }
