@@ -62,8 +62,8 @@ func (c *ServiceController) AddService() {
 				for _, data := range response {
 					if data["id"] == db["id"] {
 						data["name"] = db["name"].(string)
-						data["time"] = db["time"].(int)
-						data["price"] = db["price"].(float64)
+						data["time"] = db["time"].(float64)
+						data["price"] = db["price"].(string)
 						data["gender"] = db["gender"].(string)
 						typesResponse = append(typesResponse,data);	
 						beego.Info(data);
@@ -74,8 +74,8 @@ func (c *ServiceController) AddService() {
 				}
 			}else{
 				sType["name"] = db["name"].(string)
-				sType["time"] = db["time"].(int)
-				sType["price"] = db["price"].(float64)
+				sType["time"] = db["time"].(float64)
+				sType["price"] = db["price"].(string)
 				sType["gender"] = db["gender"].(string)
 				sType["id"]=  "service_"+strconv.FormatInt(time.Now().UnixNano(), 10)
 				typesResponse = ItoMapArray(ypes)
@@ -102,8 +102,8 @@ func (c *ServiceController) AddService() {
 			beego.Info(b);
 			var db = b.(map[string]interface{});
 			sType["name"] = db["name"].(string)
-			sType["time"] = db["time"].(int)
-			sType["price"] = db["price"].(float64)
+			sType["time"] = db["time"].(float64)
+			sType["price"] = db["price"].(string)
 			sType["gender"] = db["gender"].(string)
 		}
 		sType["id"]=  "service_"+strconv.FormatInt(time.Now().UnixNano(), 10)
