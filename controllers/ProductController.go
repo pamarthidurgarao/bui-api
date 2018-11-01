@@ -42,9 +42,11 @@ func (c *ProductController) AddProduct() {
 	}
 	if len(id) == 0 {
 		product["name"] = req["name"].(string)
+		product["brand"] = req["brand"].(string)
 		product["price"] = req["price"].(string)
+		product["stock"] = req["stock"].(string)
 		product["quantity"] = req["quantity"].(string)
-		product["totalQuantity"] = req["totalQuantity"].(string)
+		product["category"] = req["category"].(string)
 		res, _ := models.Create(constants.DATABASE, constants.PRODUCT, product)
 		c.Data["json"] = map[string]interface{}{"response": res}
 		c.ServeJSON()
@@ -54,9 +56,11 @@ func (c *ProductController) AddProduct() {
 		query["_id"] = bson.ObjectIdHex(id)
 		product["_id"] = bson.ObjectIdHex(id)
 		product["name"] = req["name"].(string)
+		product["brand"] = req["brand"].(string)
 		product["price"] = req["price"].(string)
+		product["stock"] = req["stock"].(string)
 		product["quantity"] = req["quantity"].(string)
-		product["totalQuantity"] = req["totalQuantity"].(string)
+		product["category"] = req["category"].(string)
 		res := models.Update(constants.DATABASE, constants.PRODUCT, query, product)
 		c.Data["json"] = map[string]interface{}{"response": res}
 		c.ServeJSON()
