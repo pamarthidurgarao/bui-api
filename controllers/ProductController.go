@@ -3,6 +3,8 @@ package controllers
 import (
 	"bui-api/constants"
 	"bui-api/models"
+	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"gopkg.in/mgo.v2/bson"
@@ -34,34 +36,75 @@ func (c *ProductController) AllProducts() {
 func (c *ProductController) AddProduct() {
 	req := c.GetRequestBody()
 	beego.Info(req)
-	product := make(models.Map)
-	var rawId = req["_id"]
-	var id = ""
-	if rawId != nil {
-		id = rawId.(string)
-	}
-	if len(id) == 0 {
-		product["name"] = req["name"].(string)
-		product["brand"] = req["brand"].(string)
-		product["price"] = req["price"].(string)
-		product["stock"] = req["stock"].(string)
-		product["quantity"] = req["quantity"].(string)
-		product["category"] = req["category"].(string)
-		res, _ := models.Create(constants.DATABASE, constants.PRODUCT, product)
-		c.Data["json"] = map[string]interface{}{"response": res}
-		c.ServeJSON()
+	query := make(models.Map)
+	query["category"] = req["category"].(string)
+	d := models.FindOne(constants.DATABASE, constants.PRODUCT, query)
+	typesResponse := make([]models.Map, 0)
+	if d != nil && len(d) > 0 {
+		beego.Info("Loop inside")
+		beego.Info(d)
+		product := make(models.Map)
+		var body = req["products"]
+		var reqBody = ItoMapArray1(body)
+		for _, b := range reqBody {
+			beego.Info(b)
+			var db = b.(map[string]interface{})
+			var ypes = d["products"]
+			var response = ItoMapArray(ypes)
+			if db["id"] != nil {
+				for _, data := range response {
+					if data["id"] == db["id"] {
+						data["name"] = db["name"].(string)
+						data["brand"] = db["brand"].(string)
+						data["price"] = db["price"].(float64)
+						data["stock"] = db["stock"].(float64)
+						data["quantity"] = db["quantity"].(float64)
+						typesResponse = append(typesResponse, data)
+						beego.Info(data)
+					} else {
+						typesResponse = append(typesResponse, data)
+						beego.Info(data)
+					}
+				}
+			} else {
+				product["name"] = db["name"].(string)
+				product["brand"] = db["brand"].(string)
+				product["price"] = db["price"].(float64)
+				product["stock"] = db["stock"].(float64)
+				product["quantity"] = db["quantity"].(float64)
+				product["id"] = "service_" + strconv.FormatInt(time.Now().UnixNano(), 10)
+				typesResponse = ItoMapArray(ypes)
+				typesResponse = append(typesResponse, product)
+			}
+			model := make(models.Map)
+			model["category"] = d["category"].(string)
+			model["_id"] = d["_id"].(bson.ObjectId)
+			model["products"] = typesResponse
+			res := models.Update(constants.DATABASE, constants.PRODUCT, query, model)
+			c.Data["json"] = map[string]interface{}{"response": res}
+			c.ServeJSON()
+		}
+
 	} else {
-		beego.Info("Inside update")
-		query := make(models.Map)
-		query["_id"] = bson.ObjectIdHex(id)
-		product["_id"] = bson.ObjectIdHex(id)
-		product["name"] = req["name"].(string)
-		product["brand"] = req["brand"].(string)
-		product["price"] = req["price"].(string)
-		product["stock"] = req["stock"].(string)
-		product["quantity"] = req["quantity"].(string)
-		product["category"] = req["category"].(string)
-		res := models.Update(constants.DATABASE, constants.PRODUCT, query, product)
+		model := make(models.Map)
+		products := make([]models.Map, 0)
+		product := make(models.Map)
+		model["category"] = req["category"].(string)
+		var body = req["products"]
+		var reqBody = ItoMapArray1(body)
+		for _, b := range reqBody {
+			beego.Info(b)
+			var db = b.(map[string]interface{})
+			product["name"] = db["name"].(string)
+			product["brand"] = db["brand"].(string)
+			product["price"] = db["price"].(float64)
+			product["stock"] = db["stock"].(float64)
+			product["quantity"] = db["quantity"].(float64)
+		}
+		product["id"] = "service_" + strconv.FormatInt(time.Now().UnixNano(), 10)
+		products = append(products, product)
+		model["products"] = products
+		res, _ := models.Create(constants.DATABASE, constants.PRODUCT, model)
 		c.Data["json"] = map[string]interface{}{"response": res}
 		c.ServeJSON()
 	}
