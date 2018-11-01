@@ -58,7 +58,7 @@ func (c *ProductController) AddProduct() {
 						data["brand"] = db["brand"].(string)
 						data["price"] = db["price"].(float64)
 						data["stock"] = db["stock"].(float64)
-						data["quantity"] = db["quantity"].(float64)
+						data["quantity"] = db["quantity"].(string)
 						typesResponse = append(typesResponse, data)
 						beego.Info(data)
 					} else {
@@ -71,7 +71,7 @@ func (c *ProductController) AddProduct() {
 				product["brand"] = db["brand"].(string)
 				product["price"] = db["price"].(float64)
 				product["stock"] = db["stock"].(float64)
-				product["quantity"] = db["quantity"].(float64)
+				product["quantity"] = db["quantity"].(string)
 				product["id"] = "service_" + strconv.FormatInt(time.Now().UnixNano(), 10)
 				typesResponse = ItoMapArray(ypes)
 				typesResponse = append(typesResponse, product)
@@ -99,7 +99,7 @@ func (c *ProductController) AddProduct() {
 			product["brand"] = db["brand"].(string)
 			product["price"] = db["price"].(float64)
 			product["stock"] = db["stock"].(float64)
-			product["quantity"] = db["quantity"].(float64)
+			product["quantity"] = db["quantity"].(string)
 		}
 		product["id"] = "service_" + strconv.FormatInt(time.Now().UnixNano(), 10)
 		products = append(products, product)
